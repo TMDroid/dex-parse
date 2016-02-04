@@ -1,0 +1,15 @@
+{
+  "name": "dex-parse",
+  "version": "0.0.1",
+  "description": "DEX machine file parser",
+  "main": "index.js",
+  "scripts": {
+    "test": "cd test && mocha"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+      "chai": "*",
+      "mocha": "*"
+  }
+}
