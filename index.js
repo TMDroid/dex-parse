@@ -39,27 +39,22 @@ exports.DexData = DexData;
 
 var parseID1 = function(line, context) {
     var parts = line.split("*")
-    var machine = context.machine || {}
+    context.machine = context.machine || {}
     
-    assign(parts, 1, machine, "serialNumber")
-    assign(parts, 2, machine, "modelNumber")
-    assign(parts, 3, machine, "buildStandard")
-    assign(parts, 6, machine, "assetNumber")
-    
-    context.machine = machine
+    assign(parts, 1, context.machine, "serialNumber")
+    assign(parts, 2, context.machine, "modelNumber")
+    assign(parts, 3, context.machine, "buildStandard")
+    assign(parts, 6, context.machine, "assetNumber")
 }
 
 var parseCB1 = function(line, context) {
     var parts = line.split("*")
-    var machine = context.machine || {}
-    var cb = {}
+    context.machine = context.machine || {}
+    context.machine.controlBoard = context.machine.controlBoard || {}
     
-    assign(parts, 1, cb, "serialNumber")
-    assign(parts, 2, cb, "modelNumber")
-    assign(parts, 3, cb, "softwareRevision")
-    
-    machine.controlBoard = cb
-    context.machine = machine
+    assign(parts, 1, context.machine.controlBoard, "serialNumber")
+    assign(parts, 2, context.machine.controlBoard, "modelNumber")
+    assign(parts, 3, context.machine.controlBoard, "softwareRevision")
 }
 
 var parsePA1 = function(line, context) {
