@@ -4,12 +4,12 @@ var fs = require('fs')
 
 class DexData {
     constructor() {
-        this.items = [];
+        this.products = [];
     }
         
     startItem(name) {
         this.currItem = new Item(name)
-        this.items.push(this.currItem)
+        this.products.push(this.currItem)
     }
     
     complete() {
@@ -23,24 +23,28 @@ class Item {
      }
 }
 
+function assign(parts, fieldNumber, object, property, lambda) {
+    var fieldValue = parts[fieldNumber]
+    if(typeof(fieldValue) == 'string') {
+        fieldValue = fieldValue.trim()
+        if(lambda != undefined) {
+            object[property] = lambda(fieldValue)
+        } else {
+            object[property] = fieldValue
+        }
+    }
+}
+
 exports.DexData = DexData;
 
 var parseID1 = function(line, context) {
     var parts = line.split("*")
     var machine = context.machine || {}
     
-    if(parts.length >= 2) {
-        machine.serialNumber = parts[1]
-    }
-    if(parts.length >= 3) {
-        machine.modelNumber = parts[2]
-    }
-    if(parts.length >= 4) {
-        machine.buildStandard = parts[3]
-    }
-    if(parts.length >= 7) {
-        machine.assetNumber = parts[6]
-    }
+    assign(parts, 1, machine, "serialNumber")
+    assign(parts, 2, machine, "modelNumber")
+    assign(parts, 3, machine, "buildStandard")
+    assign(parts, 6, machine, "assetNumber")
     
     context.machine = machine
 }
@@ -50,15 +54,9 @@ var parseCB1 = function(line, context) {
     var machine = context.machine || {}
     var cb = {}
     
-    if(parts.length >= 2) {
-        cb.serialNumber = parts[1]
-    }
-    if(parts.length >= 3) {
-        cb.modelNumber = parts[2]
-    }
-    if(parts.length >= 4) {
-        cb.softwareRevision = parts[3]
-    }
+    assign(parts, 1, cb, "serialNumber")
+    assign(parts, 2, cb, "modelNumber")
+    assign(parts, 3, cb, "softwareRevision")
     
     machine.controlBoard = cb
     context.machine = machine
@@ -66,26 +64,23 @@ var parseCB1 = function(line, context) {
 
 var parsePA1 = function(line, context) {
     var parts = line.split("*")
-    
-    if(parts.length >= 2) {
-        context.startItem(parts[1])
-    }
-    
-    if(parts.length >= 3) {
-        context.currItem.price = parts[2] / 100
-    }
+    context.startItem()
+    assign(parts, 1, context.currItem, "name")
+    assign(parts, 2, context.currItem, "price", (i) => i / 100)
+
 }
 
 var parsePA2 = function(line, context) {
     if(context.currItem) {
         var parts = line.split("*")
-        
-        if(parts.length >= 2) {
-            context.currItem.sold = Number(parts[1])
-        }
-        if(parts.length >= 3) {
-            context.currItem.revenue = parts[2] / 100
-        }
+        assign(parts, 1, context.currItem, "sold", (i) => Number(i))
+        assign(parts, 2, context.currItem, "revenue", (i) => i / 100)
+    }
+}
+
+var parsePA3 = function(line, context) {
+    if(context.currItem) {
+        var parts = line.split("*")
     }
 }
 
@@ -110,6 +105,7 @@ var defaultHandlers = {
     "CB1" : parseCB1,
     "PA1" : parsePA1,
     "PA2" : parsePA2,
+    "PA3" : parsePA3,
     "PA5" : parsePA5
 };
 
