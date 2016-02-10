@@ -8,19 +8,13 @@ class DexData {
     }
         
     startItem(name) {
-        this.currItem = new Item(name)
+        this.currItem = {}
         this.products.push(this.currItem)
     }
     
     complete() {
         delete this.currItem
     }
-}
-
-class Item {
-    constructor(name) {
-        this.name = name
-     }
 }
 
 function assign(parts, fieldNumber, object, property, lambda) {
