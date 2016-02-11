@@ -4,12 +4,13 @@
   "description": "DEX machine file parser",
   "main": "index.js",
   "scripts": {
-    "test": "cd test && mocha"
+    "test": "istanbul cover _mocha"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
       "chai": "*",
-      "mocha": "*"
+      "mocha": "*",
+      "istanbul": "*"
   }
 }

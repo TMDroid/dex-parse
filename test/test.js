@@ -3,12 +3,19 @@ var dexparse = require('..')
 
 describe('dexparse', function() {
     it('should parse a file', function(done) {
-        dexparse.readFile('./test2.dex', function(err, data) {
+        dexparse.readFile(__dirname + '/test2.dex', function(err, data) {
             assert.isUndefined(err)
             assert.isDefined(data)
             done()
         })
     })
+    
+    it('should return error on file not found', function(done) {
+        dexparse.readFile('does not exist.dex', function(err, data) {
+            assert.isDefined(err)
+            done()
+        })
+   })
     
     it('should parse a string', function(done) {
         var text = "test data"
@@ -17,6 +24,14 @@ describe('dexparse', function() {
             assert.isDefined(data)
             done()
         })
+    })
+    
+    it('should return an error on empty string', function(done) {
+        var text = ""
+        dexparse.readText(text, function(err, data) {
+            assert.isDefined(err)
+            done()
+        })         
     })
     
     it('creates a new item for every PA1 line', function(done) {
@@ -42,6 +57,14 @@ describe('dexparse', function() {
         dexparse.readText(text, function(err, data) {
             assert.equal(99, data.products[0].sold)
             assert.equal(3.54, data.products[0].revenue)
+            done()
+        })
+    })
+    
+    it('reads test vend data from PA3', function(done) {
+        var text = "PA3*1*100"
+        dexparse.readText(text, function(err, data) {
+            assert.equal(1, data.products[0].testVendCount)
             done()
         })
     })
