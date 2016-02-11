@@ -6,7 +6,6 @@ describe('dexparse', function() {
         dexparse.readFile('./test2.dex', function(err, data) {
             assert.isUndefined(err)
             assert.isDefined(data)
-            console.log(JSON.stringify(data, null, 2))
             done()
         })
     })
@@ -39,11 +38,19 @@ describe('dexparse', function() {
     })
     
     it('reads item total sales from PA2', function(done) {
-        var text = "PA1*010*50*\n" +
-                   "PA2*99*354"
+        var text = "PA2*99*354"
         dexparse.readText(text, function(err, data) {
             assert.equal(99, data.products[0].sold)
             assert.equal(3.54, data.products[0].revenue)
+            done()
+        })
+    })
+    
+    it('reads sold out data from PS5', function(done) {
+        var text = "PA5*20010101*120000"
+        dexparse.readText(text, function(err, data) {
+            assert.equal(20010101, data.products[0].soldOutDate)
+            assert.equal(120000, data.products[0].soldOutTime)
             done()
         })
     })

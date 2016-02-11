@@ -12,6 +12,12 @@ class DexData {
         this.products.push(this.currItem)
     }
     
+    ensureItem() {
+        if(this.currItem == undefined) {
+            this.startItem()
+        }
+    }
+    
     complete() {
         delete this.currItem
     }
@@ -52,41 +58,31 @@ var parseCB1 = function(line, context) {
 }
 
 var parsePA1 = function(line, context) {
-    var parts = line.split("*")
     context.startItem()
+    var parts = line.split("*")
     assign(parts, 1, context.currItem, "name")
     assign(parts, 2, context.currItem, "price", (i) => i / 100)
 
 }
 
 var parsePA2 = function(line, context) {
-    if(context.currItem) {
-        var parts = line.split("*")
-        assign(parts, 1, context.currItem, "sold", (i) => Number(i))
-        assign(parts, 2, context.currItem, "revenue", (i) => i / 100)
-    }
+    context.ensureItem()
+    var parts = line.split("*")
+    assign(parts, 1, context.currItem, "sold", (i) => Number(i))
+    assign(parts, 2, context.currItem, "revenue", (i) => i / 100)
 }
-
+            
+            
 var parsePA3 = function(line, context) {
-    if(context.currItem) {
-        var parts = line.split("*")
-    }
+    context.ensureItem()
+    var parts = line.split("*")
 }
 
 var parsePA5 = function(line, context) {
-    if(context.currItem) {
-        var parts = line.split("*")
-        var date = ""
-        var time = ""
-        if(parts.length >= 2) {
-            date = parts[1]
-        }
-        if(parts.length >= 3) {
-            time = parts[2]
-        }
-        
-        context.currItem.lastSale = date + " " + time
-    }
+    context.ensureItem()
+    var parts = line.split("*")
+    assign(parts, 1, context.currItem, "soldOutDate")
+    assign(parts, 2, context.currItem, "soldOutTime")
 }
 
 var defaultHandlers = {
