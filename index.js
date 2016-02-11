@@ -76,6 +76,7 @@ var parsePA2 = function(line, context) {
 var parsePA3 = function(line, context) {
     context.ensureItem()
     var parts = line.split("*")
+    assign(parts, 1, context.currItem, "testVendCount")
 }
 
 var parsePA5 = function(line, context) {
@@ -83,6 +84,7 @@ var parsePA5 = function(line, context) {
     var parts = line.split("*")
     assign(parts, 1, context.currItem, "soldOutDate")
     assign(parts, 2, context.currItem, "soldOutTime")
+    assign(parts, 3, context.currItem, "soldOutCount")
 }
 
 var defaultHandlers = {
@@ -97,12 +99,14 @@ var defaultHandlers = {
 exports.readText = function(text, cb) {
     var handlers = defaultHandlers
     
-    var lines = text.toString().split('\n')
+    text = text.toString()
     
-    if(lines.length <= 0) {
+    if(text.length <= 0) {
         cb(new Error('file or text was empty'));
         return
     }
+    
+    var lines = text.toString().split('\n')
     
     var dexdata = new DexData()
     
