@@ -4,13 +4,15 @@
   "description": "DEX machine file parser",
   "main": "index.js",
   "scripts": {
-    "test": "istanbul cover _mocha"
+    "test": "istanbul cover _mocha",
+    "cov": "NODE_ENV=test istanbul cover ./node_modules/mocha/bin/_mocha --report lcovonly -- -R spec && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
       "chai": "*",
       "mocha": "*",
-      "istanbul": "*"
+      "istanbul": "*",
+      "coveralls": "*"
   }
 }
