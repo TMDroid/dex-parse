@@ -1,5 +1,5 @@
 var assert = require('chai').assert
-var dexparse = require('..')
+var dexparse = require('../to-json')
 
 describe('dexparse', function() {
     it('should parse a file', function(done) {
