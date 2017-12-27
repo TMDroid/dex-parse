@@ -8,7 +8,7 @@ class DexData {
     }
 
     startItem (name) {
-        this.currItem = {}
+        this.currItem = {data: {}}
         this.products.push(this.currItem)
     }
 
@@ -37,6 +37,14 @@ function assign (parts, fieldNumber, object, property, lambda) {
 
 exports.DexData = DexData
 
+var parseDXS = function (line, context) {
+    var parts = line.split('*')
+    context.machine = context.machine || {}
+
+    assign(parts, 1, context.machine, 'communicationId')
+    assign(parts, 3, context.machine, 'version')
+}
+
 var parseID1 = function (line, context) {
     var parts = line.split('*')
     context.machine = context.machine || {}
@@ -44,6 +52,7 @@ var parseID1 = function (line, context) {
     assign(parts, 1, context.machine, 'serialNumber')
     assign(parts, 2, context.machine, 'modelNumber')
     assign(parts, 3, context.machine, 'buildStandard')
+    assign(parts, 4, context.machine, 'location')
     assign(parts, 6, context.machine, 'assetNumber')
 }
 
@@ -60,33 +69,34 @@ var parseCB1 = function (line, context) {
 var parsePA1 = function (line, context) {
     context.startItem()
     var parts = line.split('*')
-    assign(parts, 1, context.currItem, 'name')
-    assign(parts, 2, context.currItem, 'price', (i) => i / 100)
+    assign(parts, 1, context.currItem.data, 'name')
+    assign(parts, 2, context.currItem.data, 'price', (i) => i / 100)
 
 }
 
 var parsePA2 = function (line, context) {
     context.ensureItem()
     var parts = line.split('*')
-    assign(parts, 1, context.currItem, 'sold', (i) => Number(i))
-    assign(parts, 2, context.currItem, 'revenue', (i) => i / 100)
+    assign(parts, 1, context.currItem.data, 'sold', (i) => Number(i))
+    assign(parts, 2, context.currItem.data, 'revenue', (i) => i / 100)
 }
 
 var parsePA3 = function (line, context) {
     context.ensureItem()
     var parts = line.split('*')
-    assign(parts, 1, context.currItem, 'testVendCount')
+    assign(parts, 1, context.currItem.data, 'testVendCount')
 }
 
 var parsePA5 = function (line, context) {
     context.ensureItem()
     var parts = line.split('*')
-    assign(parts, 1, context.currItem, 'soldOutDate')
-    assign(parts, 2, context.currItem, 'soldOutTime')
-    assign(parts, 3, context.currItem, 'soldOutCount')
+    assign(parts, 1, context.currItem.data, 'soldOutDate')
+    assign(parts, 2, context.currItem.data, 'soldOutTime')
+    assign(parts, 3, context.currItem.data, 'soldOutCount')
 }
 
 var defaultHandlers = {
+    'DXS': parseDXS,
     'ID1': parseID1,
     'CB1': parseCB1,
     'PA1': parsePA1,

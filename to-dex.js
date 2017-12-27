@@ -125,11 +125,11 @@ let writeProductsData = (products, arr) => {
          * PA5
          * PA5*20120301*125320*0
          *
-         * date = sold out date = YYYYMMDD
-         * time = sold out time = HHMMSS
-         * sel = number of times sold out product selected
+         * soldOutDate = sold out date = YYYYMMDD
+         * soldOutTime = sold out time = HHMMSS
+         * soldOutCount = number of times sold out product selected
          */
-        arr.push(format('PA5*{date}*{time}*{sel}', product))
+        arr.push(format('PA5*{soldOutDate}*{soldOutTime}*{soldOutCount}', product.data))
     })
 }
 
@@ -192,11 +192,11 @@ let addAditionalHeaders = (arr) => {
     })
 }
 
-exports.get = (object) => {
+exports.convert = (object, cb) => {
     let dex = []
     writeMachineData(object.machine, dex)
     writeProductsData(object.products, dex)
     writeMachineFooter(object, dex)
 
-    return serialize(dex)
+    cb(undefined, serialize(dex))
 }

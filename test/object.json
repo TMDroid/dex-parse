@@ -1,0 +1,30 @@
+{
+  "products": [
+    {
+      "data": {
+        "name": "010",
+        "price": 0.5,
+        "sold": 6,
+        "revenue": 3.5,
+        "testVendCount": "2",
+        "soldOutDate": "20120301",
+        "soldOutTime": "125320",
+        "soldOutCount": "0"
+      }
+    }
+  ],
+  "machine": {
+    "communicationId": "WTN4213952",
+    "serialNumber": "WTN11082110074",
+    "version": "V0/6",
+    "modelNumber": "GVC1",
+    "buildStandard": "8207",
+    "location": "",
+    "assetNumber": "",
+    "controlBoard": {
+      "serialNumber": "11082110074",
+      "modelNumber": "GVC1",
+      "softwareRevision": "8207"
+    }
+  }
+}
