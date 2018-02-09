@@ -35,6 +35,8 @@ let calculateCrc = (arr) => {
  * @returns {*}
  */
 let format = (str, data, def = '') => {
+    if (data === undefined || data === null || data.length === 0) return ''
+
     let answer = strformat(str, data)
 
     return answer.replace(/{(.*?)}/g, def)
