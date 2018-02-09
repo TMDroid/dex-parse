@@ -1,7 +1,7 @@
 {
   "name": "dex-parse",
-  "version": "0.0.1",
-  "description": "DEX machine file parser",
+  "version": "0.0.2",
+  "description": "DEX machine file parser to JSON and back",
   "main": "index.js",
   "scripts": {
     "test": "istanbul cover _mocha",
