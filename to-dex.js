@@ -254,3 +254,54 @@ exports.convert = (object, cb) => {
 
     cb(undefined, serialize(dex))
 }
+
+/*
+object =  {
+    machine: {
+        version, //Machine version (0/6)
+        currency: {
+            currencyDecimalPoint,
+            currencyCode,
+            alphabeticCurrencyCode
+        },
+        controlBoard: {
+            vmcBoardSerialNumber,
+            vmcBoardModelNumber,
+            vmcBoardBuildStandard
+        },
+        details : {
+            serialNumber,
+            modelNumber,
+            buildStandard,
+            location,
+            assetNumber
+        }
+    },
+    products: [
+        { //Product 1
+            data: {
+                selectionNumber,
+                price,
+                id,
+                selection,
+                level,
+                minimum,
+                soldOutDate, //PA5
+                soldOutTime,
+                soldOutCount,
+            },
+            history: {
+                npi, vpi, npr, vpr,
+                ndi, vdi, ndr, vdr,
+                nsi, vsi, nsr, vsr
+            },
+            tests: {
+                nti, vti, ntr, vtr
+            },
+            free: {
+                nfi, vfi, nfr, vfr
+            },
+
+        },
+    ]
+}*/
