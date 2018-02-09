@@ -6,7 +6,8 @@ let serialize = (arr) => {
     let str = ''
 
     arr.forEach(element => {
-        str += element + '\n'
+        if (element !== '')
+            str += element + '\n'
     })
 
     return str
@@ -40,18 +41,63 @@ let format = (str, data, def = '') => {
 }
 
 let writeMachineData = (machine, arr) => {
-    let tmp
-    tmp = format('DXS*{0}*VA*{1}*1', [uniqid().toUpperCase(), machine.version])
-    arr.push(tmp)
+    /**
+     * DXS
+     * DXS*9259630009*VA*V1/1*1**
+     *
+     * DXS01 = id       = COMMUNICATION ID OF SENDER
+     * & DXS02 = FUNCTIONAL IDENTIFIER (VA)
+     * DXS03 = version  = VERSION (0/6)
+     * & DXS04 = TRANSMISSION CONTROL NUMBER (1)
+     */
+    arr.push(format('DXS*{0}*VA*{1}*1', {
+        id: uniqid().toUpperCase(),
+        version: machine.version
+    }))
+
+    /**
+     * ST
+     * ST*001*0001
+     *
+     * & ST01 = TRANSACTION SET HEADER (001)
+     * & ST02 = TRANSACTION SET CONTROL NUMBER (0001)
+     */
     arr.push('ST*001*0001') //transaction set header, transaction set control number
 
-    tmp = format('ID1*{serialNumber}*{modelNumber}*{buildStandard}*{location}*{assetNumber}*', machine)
-    arr.push(tmp)
-    arr.push('ID4*2*001*5') //currency decimal, numeric code, alphabetic code
+    /**
+     * ID1
+     * ID1*WTN11082110074*GVC1*8207***
+     *
+     * ID101 = serialNumber = MACHINE SERIAL NUMBER
+     * ID102 = modelNumber  = MACHINE MODEL NUMBER
+     * ID103 = buildStandard= MACHINE BUILD STANDARD
+     * ID104 = location     = MACHINE LOCATION
+     * & ID105 = User Defined Field
+     * ID106 = assetNumber  = MACHINE ASSET NUMBER
+     * & ID107 = DTS Level
+     * & ID108 = DTS Revision
+     */
+    arr.push(format('ID1*{serialNumber}*{modelNumber}*{buildStandard}*{location}*{assetNumber}*', machine))
 
-    tmp = format('CB1*{serialNumber}*{modelNumber}*{softwareVersion}', machine.controlBoard)
-    arr.push(tmp)
-    addAditionalHeaders(arr)
+    /**
+     * ID4
+     * ID4*2*001*5
+     *
+     * ID401 = currencyDecimalPoint   = DECIMAL POINT POSITION
+     * ID402 = currencyCode           = CURRENCY NUMERIC CODE
+     * ID403 = alphabeticCurrencyCode = CURRENCY ALPHABETIC CODE
+     */
+    arr.push('ID4*{currencyDecimalPoint}*{currencyCode}*{alphabeticCurrencyCode}', machine.currency) //currency decimal, numeric code, alphabetic code
+
+    /**
+     * CB1
+     * CB1*11082110074*GVC1*8207
+     *
+     * These are all optional VMC Control Board info
+     */
+    arr.push(format('CB1*{vmcBoardSerialNumber}*{vmcBoardModelNumber}*{vmcBoardBuildStandard}', machine.controlBoard))
+
+    // addAditionalHeaders(arr)
 }
 
 let writeProductsData = (products, arr) => {
@@ -69,14 +115,17 @@ let writeProductsData = (products, arr) => {
          * PA1
          * PA1*010*50*****
          *
-         * name = product name
-         * price = product price (no decimals => $1.50 = 150)
-         * id = product identification
-         * selection = SELECTION STATUS (0 or blank (recommended) = Selection Present)
-         * level = current product level
-         * minimum = minimum product level
+         * PA101 = selectionNumber  = PRODUCT IDENTIFIER (Recommend: Product Identifier = Panel Selection #)
+         * PA102 = price            = product price (no decimals => $1.50 = 150)
+         * PA103 = id               = PRODUCT IDENTIFICATION
+         * & PA104 = Maximum Product Capacity
+         * & PA105 = Standard Filling Level
+         * & PA106 = Standard Dispensed Quantity
+         * PA107 = selection        = SELECTION STATUS (0 or blank (recommended) = Selection Present)
+         * PA108 = level            = current product level
+         * PA109 = minimum          = minimum product level
          */
-        arr.push(format('PA1*{name}*{price}*{id}****{selection}*{level}*{minimum}*', product.data))
+        arr.push(format('PA1*{selectionNumber}*{price}*{id}****{selection}*{level}*{minimum}*', product.data))
 
         /**
          * PA2
@@ -192,6 +241,11 @@ let addAditionalHeaders = (arr) => {
     })
 }
 
+/**
+ *
+ * @param object = object mapped correspondingly to fit the format defined below
+ * @param cb = callback
+ */
 exports.convert = (object, cb) => {
     let dex = []
     writeMachineData(object.machine, dex)
