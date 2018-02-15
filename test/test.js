@@ -111,6 +111,7 @@ describe('dexparse', function () {
 
                 console.log(object)
                 console.log(data)
+                done()
             })
         })
 

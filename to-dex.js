@@ -89,7 +89,9 @@ let writeMachineData = (machine, arr) => {
      * ID402 = currencyCode           = CURRENCY NUMERIC CODE
      * ID403 = alphabeticCurrencyCode = CURRENCY ALPHABETIC CODE
      */
-    arr.push('ID4*{currencyDecimalPoint}*{currencyCode}*{alphabeticCurrencyCode}', machine.currency) //currency decimal, numeric code, alphabetic code
+    if (machine.currency !== undefined && machine.currency !== null) {
+        arr.push('ID4*{currencyDecimalPoint}*{currencyCode}*{alphabeticCurrencyCode}', machine.currency) //currency decimal, numeric code, alphabetic code
+    }
 
     /**
      * CB1
@@ -243,6 +245,20 @@ let addAditionalHeaders = (arr) => {
     })
 }
 
+let writeDataToFile = (name, dexData) => {
+    let fs = require('fs')
+    let logger = fs.createWriteStream(name, {
+        flags: 'w'
+    })
+
+    dexData.forEach(line => {
+        if (line !== undefined && line !== null && line !== '')
+            logger.write(line + '\n')
+    })
+
+    logger.end()
+}
+
 /**
  *
  * @param object = object mapped correspondingly to fit the format defined below
@@ -253,6 +269,8 @@ exports.convert = (object, cb) => {
     writeMachineData(object.machine, dex)
     writeProductsData(object.products, dex)
     writeMachineFooter(object, dex)
+
+    writeDataToFile('somefilename.txt', dex)
 
     cb(undefined, serialize(dex))
 }
