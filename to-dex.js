@@ -7,7 +7,7 @@ let serialize = (arr) => {
 
     arr.forEach(element => {
         if (element !== '')
-            str += element + '\n'
+            str += element + '\r\n'
     })
 
     return str
@@ -194,7 +194,7 @@ let writeProductsData = (products, arr) => {
          * soldOutTime = sold out time = HHMMSS
          * soldOutCount = number of times sold out product selected
          */
-        if (product.data) {
+        if (product.data.soldOutDate || product.data.soldOutTime || product.data.soldOutCount) {
             arr.push(format('PA5*{soldOutDate}*{soldOutTime}*{soldOutCount}', product.data))
         }
     })

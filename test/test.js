@@ -3,7 +3,7 @@ var dexparse = require('./../to-json')
 var jsonparse = require('./../to-dex')
 
 describe('dexparse', function () {
-    it('should parse a file', function (done) {
+    xit('should parse a file', function (done) {
         dexparse.readFile(__dirname + '/test2.dex', function (err, data) {
             assert.isUndefined(err)
             assert.isDefined(data)
@@ -11,14 +11,14 @@ describe('dexparse', function () {
         })
     })
 
-    it('should return error on file not found', function (done) {
+    xit('should return error on file not found', function (done) {
         dexparse.readFile('does not exist.dex', function (err, data) {
             assert.isDefined(err)
             done()
         })
     })
 
-    it('should parse a string', function (done) {
+    xit('should parse a string', function (done) {
         var text = 'test data'
         dexparse.readText(text, function (err, data) {
             assert.isUndefined(err)
@@ -27,7 +27,7 @@ describe('dexparse', function () {
         })
     })
 
-    it('should return an error on empty string', function (done) {
+    xit('should return an error on empty string', function (done) {
         var text = ''
         dexparse.readText(text, function (err, data) {
             assert.isDefined(err)
@@ -35,7 +35,7 @@ describe('dexparse', function () {
         })
     })
 
-    it('creates a new item for every PA1 line', function (done) {
+    xit('creates a new item for every PA1 line', function (done) {
         var text = 'PA1*010*50*****\n' +
             'PA1*011*50*****'
         dexparse.readText(text, function (err, data) {
@@ -44,7 +44,7 @@ describe('dexparse', function () {
         })
     })
 
-    it('reads item ID and price from PA1', function (done) {
+    xit('reads item ID and price from PA1', function (done) {
         var text = 'PA1*010*50*'
         dexparse.readText(text, function (err, data) {
             assert.equal('010', data.products[0].name)
@@ -53,7 +53,7 @@ describe('dexparse', function () {
         })
     })
 
-    it('reads item total sales from PA2', function (done) {
+    xit('reads item total sales from PA2', function (done) {
         var text = 'PA2*99*354'
         dexparse.readText(text, function (err, data) {
             assert.equal(99, data.products[0].sold)
@@ -62,7 +62,7 @@ describe('dexparse', function () {
         })
     })
 
-    it('reads test vend data from PA3', function (done) {
+    xit('reads test vend data from PA3', function (done) {
         var text = 'PA3*1*100'
         dexparse.readText(text, function (err, data) {
             assert.equal(1, data.products[0].testVendCount)
@@ -70,7 +70,7 @@ describe('dexparse', function () {
         })
     })
 
-    it('reads sold out data from PS5', function (done) {
+    xit('reads sold out data from PS5', function (done) {
         var text = 'PA5*20010101*120000'
         dexparse.readText(text, function (err, data) {
             assert.equal(20010101, data.products[0].soldOutDate)
@@ -79,7 +79,7 @@ describe('dexparse', function () {
         })
     })
 
-    it('reads machine data from ID1', function (done) {
+    xit('reads machine data from ID1', function (done) {
         var text = 'ID1*WTN11082110074*GVC1        *8207***'
 
         dexparse.readText(text, function (err, data) {
@@ -89,7 +89,7 @@ describe('dexparse', function () {
         })
     })
 
-    it('reads control board data from CB1', function (done) {
+    xit('reads control board data from CB1', function (done) {
         var text = 'CB1*11082110074*GVC1        *8207'
 
         dexparse.readText(text, function (err, data) {
@@ -100,7 +100,7 @@ describe('dexparse', function () {
         })
     })
 
-    it('should convert an object from json to dex and back', function (done) {
+    xit('should convert an object from json to dex and back', function (done) {
         let object = require('./object.json')
 
         jsonparse.convert(object, function (err, dexdata) {
@@ -114,7 +114,42 @@ describe('dexparse', function () {
                 done()
             })
         })
+    })
 
+    it('should convert a dex file to object and back', function(done) {
+        let fs = require('fs'),
+            path = require('path'),
+            filePath = path.join(__dirname, 'dex3.dex')
+
+        fs.readFile(filePath, {encoding: 'utf-8'}, (err, text) => {
+            if(err) return done(err)
+
+            dexparse.readText(text, (err, object) => {
+                jsonparse.convert(object, (err, dexData) => {
+                    let apiAdapter = require('./../../apiAdapter')
+
+                    let object = require('./dex.json')
+                    object.DexData = dexData
+
+                    apiAdapter.sendDex(object)
+                        .then(response => {
+                            console.log(response)
+                            done()
+                        })
+                })
+            })
+        })
+    })
+
+    xit('should send a dex file to aws', done => {
+        let object = require('./dex.json')
+        let apiAdapter = require('./../../apiAdapter')
+
+        apiAdapter.sendDex(object)
+            .then(response => {
+                console.log(response)
+                done()
+            })
     })
 
 })
