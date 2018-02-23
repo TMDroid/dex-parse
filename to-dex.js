@@ -43,11 +43,13 @@ let format = (str, data, def = '') => {
 }
 
 let writeMachineData = (machine, arr) => {
+    if (!machine) return
+
     /**
      * DXS
      * DXS*9259630009*VA*V1/1*1**
      *
-     * DXS01 = id       = COMMUNICATION ID OF SENDER
+     * DXS01 = id = COMMUNICATION ID OF SENDER
      * & DXS02 = FUNCTIONAL IDENTIFIER (VA)
      * DXS03 = version  = VERSION (0/6)
      * & DXS04 = TRANSMISSION CONTROL NUMBER (1)
@@ -89,7 +91,7 @@ let writeMachineData = (machine, arr) => {
      * ID402 = currencyCode           = CURRENCY NUMERIC CODE
      * ID403 = alphabeticCurrencyCode = CURRENCY ALPHABETIC CODE
      */
-    if (machine.currency !== undefined && machine.currency !== null) {
+    if (machine.currency) {
         arr.push('ID4*{currencyDecimalPoint}*{currencyCode}*{alphabeticCurrencyCode}', machine.currency) //currency decimal, numeric code, alphabetic code
     }
 
@@ -99,7 +101,9 @@ let writeMachineData = (machine, arr) => {
      *
      * These are all optional VMC Control Board info
      */
-    arr.push(format('CB1*{vmcBoardSerialNumber}*{vmcBoardModelNumber}*{vmcBoardBuildStandard}', machine.controlBoard))
+    if (machine.controlBoard) {
+        arr.push(format('CB1*{vmcBoardSerialNumber}*{vmcBoardModelNumber}*{vmcBoardBuildStandard}', machine.controlBoard))
+    }
 
     // addAditionalHeaders(arr)
 }
@@ -113,7 +117,7 @@ let writeProductsData = (products, arr) => {
             PA4*0*0*0*0
             PA5*20120301*125320*0
          */
-        product.data.price = product.data.price * 100
+        product.data.price = parseInt(product.data.price * 100)
 
         /**
          * PA1
@@ -129,7 +133,9 @@ let writeProductsData = (products, arr) => {
          * PA108 = level            = current product level
          * PA109 = minimum          = minimum product level
          */
-        arr.push(format('PA1*{selectionNumber}*{price}*{id}****{selection}*{level}*{minimum}*', product.data))
+        if (product.data) {
+            arr.push(format('PA1*{selectionNumber}*{price}*{id}****{selection}*{level}*{minimum}*', product.data))
+        }
 
         /**
          * PA2
@@ -150,7 +156,9 @@ let writeProductsData = (products, arr) => {
          * nsr = number of surcharged since last reset
          * vsr = value of surcharged since last reset
          */
-        arr.push(format('PA2*{npi}*{vpi}*{npr}*{vpr}*{ndi}*{vdi}*{ndr}*{vdr}*{nsi}*{vsi}*{nsr}*{vsr}', product.history, 0)) //product history
+        if (product.history) {
+            arr.push(format('PA2*{npi}*{vpi}*{npr}*{vpr}*{ndi}*{vdi}*{ndr}*{vdr}*{nsi}*{vsi}*{nsr}*{vsr}', product.history, 0)) //product history
+        }
 
         /**
          * PA3
@@ -161,7 +169,9 @@ let writeProductsData = (products, arr) => {
          * ntr = number of test vends since reset
          * vtr = value of test vends since reset
          */
-        arr.push(format('PA3*{nti}*{vti}*{ntr}*{vtr}', product.tests, 0))
+        if (product.tests) {
+            arr.push(format('PA3*{nti}*{vti}*{ntr}*{vtr}', product.tests, 0))
+        }
 
         /**
          * PA4
@@ -172,7 +182,9 @@ let writeProductsData = (products, arr) => {
          * nfr = number of free products since last reset
          * vfr = value of free products since last reset
          */
-        arr.push(format('PA4*{nfi}*{vfi}*{nfr}*{vfr}', product.free, 0))
+        if (product.free) {
+            arr.push(format('PA4*{nfi}*{vfi}*{nfr}*{vfr}', product.free, 0))
+        }
 
         /**
          * PA5
@@ -182,7 +194,9 @@ let writeProductsData = (products, arr) => {
          * soldOutTime = sold out time = HHMMSS
          * soldOutCount = number of times sold out product selected
          */
-        arr.push(format('PA5*{soldOutDate}*{soldOutTime}*{soldOutCount}', product.data))
+        if (product.data) {
+            arr.push(format('PA5*{soldOutDate}*{soldOutTime}*{soldOutCount}', product.data))
+        }
     })
 }
 
@@ -252,7 +266,7 @@ let writeDataToFile = (name, dexData) => {
     })
 
     dexData.forEach(line => {
-        if (line !== undefined && line !== null && line !== '')
+        if (line)
             logger.write(line + '\n')
     })
 
