@@ -265,10 +265,7 @@ let writeDataToFile = (name, dexData) => {
         flags: 'w'
     })
 
-    dexData.forEach(line => {
-        if (line)
-            logger.write(line + '\n')
-    })
+    logger.write(dexData)
 
     logger.end()
 }
@@ -284,9 +281,11 @@ exports.convert = (object, cb) => {
     writeProductsData(object.products, dex)
     writeMachineFooter(object, dex)
 
-    writeDataToFile(`somefilename-${new Date().getTime()}.txt`, dex)
+    let serialized = serialize(dex)
 
-    cb(undefined, serialize(dex))
+    writeDataToFile(`somefilename-${new Date().getTime()}.txt`, serialized)
+
+    cb(undefined, serialized)
 }
 
 /*
