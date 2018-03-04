@@ -1,6 +1,6 @@
 let strformat = require('strformat')
 let uniqid = require('uniqid')
-let CRC16 = require('crc16')
+let crc = require('crc')
 
 let serialize = (arr) => {
     let str = ''
@@ -20,9 +20,7 @@ let calculateCrc = (arr) => {
         if (s.startsWith('ST*')) {
             let subarr = arr.slice(i, arr.length)
             let ser = serialize(subarr)
-            let crc = CRC16(ser)
-
-            return crc.toString(16)
+            return crc.crc16(ser).toString(16)
         }
     }
 }
@@ -54,7 +52,7 @@ let writeMachineData = (machine, arr) => {
      * DXS03 = version  = VERSION (0/6)
      * & DXS04 = TRANSMISSION CONTROL NUMBER (1)
      */
-    arr.push(format('DXS*{0}*VA*{1}*1', {
+    arr.push(format('DXS*{id}*VA*{version}*1', {
         id: uniqid().toUpperCase(),
         version: machine.version
     }))
@@ -81,7 +79,9 @@ let writeMachineData = (machine, arr) => {
      * & ID107 = DTS Level
      * & ID108 = DTS Revision
      */
-    arr.push(format('ID1*{serialNumber}*{modelNumber}*{buildStandard}*{location}*{assetNumber}*', machine))
+    if (machine.details) {
+        arr.push(format('ID1*{serialNumber}*{modelNumber}*{buildStandard}*{location}*{assetNumber}*', machine.details))
+    }
 
     /**
      * ID4
@@ -92,7 +92,7 @@ let writeMachineData = (machine, arr) => {
      * ID403 = alphabeticCurrencyCode = CURRENCY ALPHABETIC CODE
      */
     if (machine.currency) {
-        arr.push('ID4*{currencyDecimalPoint}*{currencyCode}*{alphabeticCurrencyCode}', machine.currency) //currency decimal, numeric code, alphabetic code
+        arr.push(format('ID4*{currencyDecimalPoint}*{currencyCode}*{alphabeticCurrencyCode}', machine.currency)) //currency decimal, numeric code, alphabetic code
     }
 
     /**
@@ -117,7 +117,7 @@ let writeProductsData = (products, arr) => {
             PA4*0*0*0*0
             PA5*20120301*125320*0
          */
-        product.data.price = parseInt(product.data.price * 100)
+        // product.data.price = parseInt(product.data.price * 100)
 
         /**
          * PA1
@@ -217,7 +217,7 @@ let writeMachineFooter = (obj, arr) => {
      * TODO (2) Inca n-am idee cum calculez asta
      * sets = Number of Included Sets
      */
-    arr.push(format('SE*{sets}*0001', {sets: 54}))
+    arr.push(format('SE*{sets}*0001', {sets: obj.products.length}))
 
     /**
      * DXE
@@ -284,7 +284,7 @@ exports.convert = (object, cb) => {
     writeProductsData(object.products, dex)
     writeMachineFooter(object, dex)
 
-    writeDataToFile('somefilename.txt', dex)
+    writeDataToFile(`somefilename-${new Date().getTime()}.txt`, dex)
 
     cb(undefined, serialize(dex))
 }
